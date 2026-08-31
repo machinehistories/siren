@@ -27,17 +27,25 @@ jobs:
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=Release
 
     - name: Build the project
-      run: msbuild $env:Solution_Name /p:Configuration=Release
+      run: msbuild $env:Solution_Name /p:Configuration=Release /v:diagnostic
 
-    - name: List build outputs
+    - name: Debug - List all bin directories and contents
       run: |
-        Write-Host "=== Searching for .gha and .dll files ==="
-        Get-ChildItem -Path . -Recurse -File -Include *.gha,*.dll | ForEach-Object { Write-Host $_.FullName }
+        Write-Host "=== Searching for all 'bin' directories ==="
+        Get-ChildItem -Path . -Recurse -Directory -Name bin
+        Write-Host ""
+        Write-Host "=== Searching for all .gha files ==="
+        Get-ChildItem -Path . -Recurse -File -Filter *.gha | ForEach-Object { Write-Host $_.FullName }
+        Write-Host ""
+        Write-Host "=== Searching for all .dll files ==="
+        Get-ChildItem -Path . -Recurse -File -Filter *.dll | ForEach-Object { Write-Host $_.FullName }
       shell: powershell
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: grasshopper-plugin
-        path: Siren/bin/Release/
+        path: |
+          Siren/bin/
+          **/bin/
         if-no-files-found: warn
