@@ -1,6 +1,6 @@
 name: Build Grasshopper Plugin
 
-on: [push, pull_request, release]
+on: [push, pull_request, release, workflow_dispatch]
 
 jobs:
 
