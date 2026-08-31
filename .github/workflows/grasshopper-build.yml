@@ -9,44 +9,35 @@ jobs:
     name: "Build plugin"
     runs-on: windows-latest
     env:
-      Solution_Name: Siren
+      Solution_Name: ./Siren/Siren.sln
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      uses: microsoft/setup-msbuild@v1.1.3
 
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.5
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      uses: NuGet/setup-nuget@v2.0.0
 
     - name: Restore the project's packages
-      run: msbuild Siren.sln /t:Restore /p:Configuration=Release
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=Release
 
     - name: Build the project
-      run: msbuild Siren.sln /p:Configuration=Release
+      run: msbuild $env:Solution_Name /p:Configuration=Release
 
-    - name: Show build outputs (debug)
+    - name: List build outputs
       run: |
-        Write-Host "=== Listing all Release directories under repo ==="
-        Get-ChildItem -Path . -Recurse -Directory | Where-Object { $_.Name -eq 'Release' } | Select-Object FullName
-        Write-Host "=== List .gha and .dll files under bin/Release ==="
-        Get-ChildItem -Path . -Recurse -File -Include *.gha,*.dll | Select-Object FullName
+        Write-Host "=== Searching for .gha and .dll files ==="
+        Get-ChildItem -Path . -Recurse -File -Include *.gha,*.dll | ForEach-Object { Write-Host $_.FullName }
       shell: powershell
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: grasshopper-plugin
-        path: |
-          **/bin/Release/**/*.gha
-          **/bin/Release/**/*.dll
-          **/bin/Release/**/*
+        path: Siren/bin/Release/
         if-no-files-found: warn
