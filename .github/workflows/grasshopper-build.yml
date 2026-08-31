@@ -38,6 +38,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: grasshopper-plugin
-        path: |
-          **/bin/Release/**/*.dll
-          **/bin/Release/**/*.gha
+        path: Siren/bin/Release/
+        #  **/bin/Release/**/*.dll
+        #  **/bin/Release/**/*.gha
+        if-no-files-found: warn
